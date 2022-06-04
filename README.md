@@ -162,7 +162,7 @@ F -> · id              F -> id ·
 ```
 
 2. Construct a DFA
-![DFA of the grammar](dfa1.jpeg)
+![DFA of the grammar](dfa1.png)
 3. Construct an Action & Goto table
 Notation:
    - Sx: shift to state x
