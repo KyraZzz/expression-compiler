@@ -84,12 +84,12 @@ FIRST(F) = {NUM,(}      NULLABLE(F) = False
 ```
 Production       Constraints
 S -> E$          {$} ⊆ FOLLOW(E), FOLLOW(S) ⊆ FOLLOW(E)
-E -> TE'         FOLLOW(E) ⊆ FOLLOW(E')
-E' -> +TE'       FOLLOW(E') ⊆ FOLLOW(E'), FOLLOW(E') ⊆ FOLLOW(T)
-E' -> -TE'       FOLLOW(E') ⊆ FOLLOW(E'), FOLLOW(E') ⊆ FOLLOW(T)
+E -> TE'         FOLLOW(E) ⊆ FOLLOW(T), FOLLOW(E) ⊆ FOLLOW(E')
+E' -> +TE'       FOLLOW(E') ⊆ FOLLOW(T)
+E' -> -TE'       FOLLOW(E') ⊆ FOLLOW(T)
 E' -> ε
-T -> FT'         FOLLOW(T) ⊆ FOLLOW(T'), FOLLOW(T) ⊆ FOLLOW(F)
-T' -> *FT'       FOLLOW(T') ⊆ FOLLOW(T'), FOLLOW(T) ⊆ FOLLOW(F)
+T -> FT'         FOLLOW(T) ⊆ FOLLOW(F), FOLLOW(T) ⊆ FOLLOW(T')
+T' -> *FT'       FOLLOW(T') ⊆ FOLLOW(F)
 T' -> ε
 F -> NUM         
 F -> (E)         {)} ⊆ FOLLOW(E)
@@ -142,23 +142,60 @@ F                                          F->NUM    F->(E)
 1. List LR(0) items
 
 ```
-Given the set of production rules
-S -> E$         
-E -> TE'        
-E' -> +TE' 
-E' -> -TE'    
-E' -> ε
-T -> FT'   
-T' -> *FT'     
-T' -> ε
-F -> NUM         
-F -> (E)
+e.g., Given the set of production rules
+p0: S -> E$
+p1: E -> E + T
+p2: E -> T
+p3: T -> T * F 
+p4: T -> F
+p5: F -> (E) 
+p6: F -> id
 
 List all LR(0) items
-(?)
+S -> · E$              S -> E · $
+E -> · E + T           E -> E · + T          E -> E + · T
+E -> · T               E -> T ·
+T -> · T * F           T -> T · * F          T -> T * · F           T -> T * F ·
+T -> · F               T -> F ·
+F -> · (E)             F -> ( · E)           F -> (E ·)             F -> (E) ·
+F -> · id              F -> id ·
 ```
 
 2. Construct a DFA
+![DFA of the grammar](dfa1.jpeg)
 3. Construct an Action & Goto table
+Notation:
+   - Sx: shift to state x
+   - R(p): reduce production p, put in the FOLLOW set of N if the production is N -> a.
+   - Gy: goto state y
+![Action and GOTO table](gototable.png)
 
+```
+The following is an example derivation of the string `4 + 3 * (5 - 2)`
+stack            input              state stack                  action              
+                 4 + 3 * (5 + 2)$   I0                           shift to I5      
+4                + 3 * (5 + 2)$     I0,I5                        reduce F -> id, + ∈ FOLLOW(F), GOTO I3
+F                + 3 * (5 + 2)$     I0,I3                        reduce T -> F, + ∈ FOLLOW(T), GOTO I2
+T                + 3 * (5 + 2)$     I0,I2                        reduce E -> T, + ∈ FOLLOW(E), GOTO I1
+E                + 3 * (5 + 2)$     I0,I1                        shift to I6
+E +              3 * (5 + 2)$       I0,I1,I6                     shift to I5
+E + 3            * (5 + 2)$         I0,I1,I6,I5                  reduce F -> id, * ∈ FOLLOW(F), GOTO I3
+E + F            * (5 + 2)$         I0,I1,I6,I3                  reduce T -> F, * ∈ FOLLOW(T), GOTO I9
+E + T            * (5 + 2)$         I0,I1,I6,I9                  shift to I7
+E + T *          (5 + 2)$           I0,I1,I6,I9,I7               shift to I4
+E + T * (        5 + 2)$            I0,I1,I6,I9,I7,I4            shift to I5
+E + T * (5       + 2)$              I0,I1,I6,I9,I7,I4,I5         reduce F -> id, + ∈ FOLLOW(F), GOTO I3
+E + T * (F       + 2)$              I0,I1,I6,I9,I7,I4,I3         reduce T -> F, + ∈ FOLLOW(T), GOTO I2
+E + T * (T       + 2)$              I0,I1,I6,I9,I7,I4,I2         reduce E -> T, + ∈ FOLLOW(E), GOTO I8
+E + T * (E       + 2)$              I0,I1,I6,I9,I7,I4,I8         shift to I6
+E + T * (E +     2)$                I0,I1,I6,I9,I7,I4,I8,I6      shift to I5
+E + T * (E + 2   )$                 I0,I1,I6,I9,I7,I4,I8,I6,I5   reduce F -> id, ) ∈ FOLLOW(F), GOTO I3
+E + T * (E + F   )$                 I0,I1,I6,I9,I7,I4,I8,I6,I3   reduce T -> F, ) ∈ FOLLOW(T), GOTO I9
+E + T * (E + T   )$                 I0,I1,I6,I9,I7,I4,I8,I6,I9   reduce E -> E + T, ) ∈ FOLLOW(E), GOTO I8
+E + T * (E       )$                 I0,I1,I6,I9,I7,I4,I8         shift to I11
+E + T * (E)      $                  I0,I1,I6,I9,I7,I4,I8,I11     reduce F -> (E), $ ∈ FOLLOW(F), GOTO I10
+E + T * F        $                  I0,I1,I6,I9,I7,I10           reduce T -> T * F, $ ∈ FOLLOW(T), GOTO I9
+E + T            $                  I0,I1,I6,I9                  reduce E -> E + T, $ ∈ FOLLOW(E), GOTO I1 
+E                $                  I0,I1                        accept :-)
+```
 ## From high-level interpreter to low-level compiler
