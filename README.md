@@ -139,5 +139,26 @@ F                                          F->NUM    F->(E)
 
 ### SLR
 
+1. List LR(0) items
+
+```
+Given the set of production rules
+S -> E$         
+E -> TE'        
+E' -> +TE' 
+E' -> -TE'    
+E' -> ε
+T -> FT'   
+T' -> *FT'     
+T' -> ε
+F -> NUM         
+F -> (E)
+
+List all LR(0) items
+(?)
+```
+
+2. Construct a DFA
+3. Construct an Action & Goto table
 
 ## From high-level interpreter to low-level compiler
