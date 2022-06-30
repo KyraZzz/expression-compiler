@@ -6,6 +6,10 @@
     | e1 op e2 
     | if e1 then e2 else e3
     | let x = e1 in e2
+    
+    | skip
+    | e1; e2
+    | while e1 do e2
   
   bop ::= + | * | <=
 
@@ -28,3 +32,6 @@ type expr =
   | Binop of bop * expr * expr
   | Let of string * expr * expr
   | If of expr * expr * expr
+  | Skip (* e ::= skip *)
+  | Seq of expr * expr (* e ::= e1; e2 *)
+  | While of expr * expr (* e ::=  while e1 do e2 *)

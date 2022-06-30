@@ -18,6 +18,10 @@ open Ast
 %token THEN
 %token ELSE
 %token EOF
+%token SEMICOLON
+%token SKIP
+%token WHILE
+%token DO
 
 %nonassoc IN
 %nonassoc ELSE
@@ -42,4 +46,7 @@ expr:
     | LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let (x, e1, e2) }
     | IF; e1 = expr; THEN; e2 = expr; ELSE; e3 = expr { If (e1, e2, e3) }
     | LPAREN; e = expr; RPAREN { e }
+    | e1 = expr; SEMICOLON; e2 = expr {Seq (e1, e2)}
+    | SKIP { Skip }
+    | WHILE; e1 = expr; DO; e2 = expr {While (e1, e2) }
     ;

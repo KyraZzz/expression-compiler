@@ -1,7 +1,12 @@
 # expression-compiler
 Compiler construction intro tutorial - build a simple expression compiler
 
-## Lex-ing
+## Compile and run lexer and parser 
+
+```
+(root-dir) $ dune utop src
+utop# Interp.Main.parse "let x = 3110 in x + x";; 
+```
 
 ## Parsing
 
