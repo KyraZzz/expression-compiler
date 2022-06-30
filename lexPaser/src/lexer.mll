@@ -14,12 +14,17 @@ rule read =
   | white { read lexbuf }
   | "true" { TRUE }
   | "false" { FALSE }
+  | "=>" { MAPTO }
   | "<=" { LEQ }
   | "*" { TIMES }
   | "+" { PLUS }
   | "(" { LPAREN }
   | ")" { RPAREN }
+  | "[" { SLPAREN }
+  | "]" { SRPAREN }
+  | "fn" { FUNCT }
   | "let" { LET }
+  | "rec" { REC }
   | "=" { EQUALS }
   | semicolon { SEMICOLON }
   | "in" { IN }
