@@ -1,5 +1,32 @@
 # expression-compiler
 Compiler construction intro tutorial - build a simple expression compiler
+with the following syntax and semantics:
+
+```
+e ::= 
+      x 
+    | i 
+    | b 
+    | e1 op e2 
+    | if e1 then e2 else e3
+    | let x = e1 in e2
+    
+    | skip
+    | e1; e2
+    | while e1 do e2
+
+    | fn x => e
+    | e1 [e2]
+    | let rec x = (fn y => e1) in e2
+  
+  bop ::= + | * | <=
+
+  x ::= <identifiers>
+
+  i ::= <integers>
+
+  b ::= true | false
+```
 
 ## Compile and run lexer and parser 
 
